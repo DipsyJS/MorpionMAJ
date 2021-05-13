@@ -1,6 +1,7 @@
 const utils = require('./utils')
-const { MessageEmbed } = require('discord.js');
-const Schema = require('../../models/stats');
+const { MessageEmbed, SystemChannelFlags } = require('discord.js');
+const Schema = require('../../models/infos');
+const client = require('../../index');
 class Game {
     /**
      * @name tictactoe
@@ -15,7 +16,7 @@ class Game {
         if (!options.player_two) throw new TypeError("❌ | Second player is a required option")
         this.player_two = options.player_two;
         this.message = options.message;
-        this.grid = [':white_large_square: \u200b\u200b', ':white_large_square: \u200b\u200b', ':white_large_square: \n', ':white_large_square: \u200b\u200b', ':white_large_square: \u200b\u200b', ':white_large_square: \n', ':white_large_square: \u200b\u200b', ':white_large_square:  \u200b\u200b', ':white_large_square: \u200b\u200b']
+        this.grid = [':white_large_square:', ':white_large_square:', ':white_large_square:', ':white_large_square:', ':white_large_square:', ':white_large_square:', ':white_large_square:', ':white_large_square:', ':white_large_square:']
         this.ttt_grid()
         this.reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
         this.players_go = 0
@@ -33,14 +34,14 @@ class Game {
                     let grid = await this.ttt_grid()
                     if (this.players_go == 0) {
                         this.ttt_message = await this.message.channel.send('<@' + this.message.author.id + '> C\'est à ton tour de jouer\n')
-                        this.ttt_message.edit(new MessageEmbed().setDescription(grid))
+                        this.ttt_message.edit(new MessageEmbed().setColor("#2f3136").setTitle('Morpion - TicTacToe').setDescription(grid))
                         for (let i in this.reactions) {
                             this.ttt_message.react(this.reactions[i])
                         }
-                    }
-                    else {
+                    } else {
                         this.ttt_message.edit('<@' + this.message.author.id + '> C\'est à ton tour de jouer\n')
-                        this.ttt_message.edit(new MessageEmbed().setDescription(grid))
+                        this.ttt_message.edit(new MessageEmbed().setColor("#2f3136").setTitle('Morpion - TicTacToe').setDescription(grid))
+
                     }
                 }
                 this.ttt_message.awaitReactions((reaction, user) => user.id == this.message.author.id && (reaction.emoji.name == '1️⃣' || reaction.emoji.name == '2️⃣' || reaction.emoji.name == '3️⃣' || reaction.emoji.name == '4️⃣' || reaction.emoji.name == '5️⃣' || reaction.emoji.name == '6️⃣' || reaction.emoji.name == '7️⃣' || reaction.emoji.name == '8️⃣' || reaction.emoji.name == '9️⃣'),
@@ -55,7 +56,7 @@ class Game {
                         if (this.reaction == '7️⃣') this.user_input = 6
                         if (this.reaction == '8️⃣') this.user_input = 7
                         if (this.reaction == '9️⃣') this.user_input = 8
-                        this.grid[this.user_input] = ':negative_squared_cross_mark: '
+                        this.grid[this.user_input] = ':negative_squared_cross_mark:'
                         const userReactions = this.ttt_message.reactions.cache.filter(reaction => reaction.users.cache.has(this.message.author.id));
                         for (const reaction of userReactions.values()) {
                             await reaction.users.remove(this.message.author.id);
@@ -74,7 +75,7 @@ class Game {
                 if (this.send_message == true) {
                     let grid = await this.ttt_grid()
                     this.ttt_message.edit('<@' + this.player_two.id + '> C\'est à ton tour de jouer\n')
-                    this.ttt_message.edit(new MessageEmbed().setDescription(grid))
+                    this.ttt_message.edit(new MessageEmbed().setColor("#2f3136").setTitle('Morpion - TicTacToe').setDescription(grid))
                     this.ttt_message.awaitReactions((reaction, user) => user.id == this.player_two.id && (reaction.emoji.name == '1️⃣' || reaction.emoji.name == '2️⃣' || reaction.emoji.name == '3️⃣' || reaction.emoji.name == '4️⃣' || reaction.emoji.name == '5️⃣' || reaction.emoji.name == '6️⃣' || reaction.emoji.name == '7️⃣' || reaction.emoji.name == '8️⃣' || reaction.emoji.name == '9️⃣'),
                         { max: 1, time: 30000 }).then(async collected => {
                             this.reaction = collected.first().emoji.name
@@ -123,22 +124,23 @@ class Game {
         let step_one = -1
         while (step_one < 7) {
             step_one++
-            if (this.grid[win_combinations[step_one][0]] == ':negative_squared_cross_mark: ' && this.grid[win_combinations[step_one][1]] == ':negative_squared_cross_mark: ' && this.grid[win_combinations[step_one][2]] == ':negative_squared_cross_mark: ') {
+            if (this.grid[win_combinations[step_one][0]] == ':negative_squared_cross_mark:' && this.grid[win_combinations[step_one][1]] == ':negative_squared_cross_mark:' && this.grid[win_combinations[step_one][2]] == ':negative_squared_cross_mark:') {
                 let grid = await this.ttt_grid()
-                this.ttt_message.edit('<@' + this.message.author.id + '> Victoire !\n')
-                this.ttt_message.edit(new MessageEmbed().setDescription(grid))
+                this.ttt_message.edit(new MessageEmbed().setColor("#2f3136").setTitle('Morpion - TicTacToe').setDescription(grid))
                 this.end_game(this.player_two, this.message)
+
+
             }
             if (this.grid[win_combinations[step_one][0]] == ':regional_indicator_o: ' && this.grid[win_combinations[step_one][1]] == ':regional_indicator_o: ' && this.grid[win_combinations[step_one][2]] == ':regional_indicator_o: ') {
                 let grid = await this.ttt_grid()
                 this.ttt_message.edit('<@' + this.player_two.id + '> Victoire !\n')
-                this.ttt_message.edit(new MessageEmbed().setDescription(grid))
+                this.ttt_message.edit(new MessageEmbed().setColor("#2f3136").setTitle('Morpion - TicTacToe').setDescription(grid))
                 this.end_game(this.player_two, this.message)
             }
             if (this.players_go == 9 && step_one == 7) {
                 let grid = await this.ttt_grid()
                 this.ttt_message.edit('Vous êtes égalités ! Vous pouvez rejouer !\n')
-                this.ttt_message.edit(new MessageEmbed().setDescription(grid))
+                this.ttt_message.edit(new MessageEmbed().setColor("#2f3136").setTitle('Morpion - TicTacToe').setDescription(grid))
                 this.end_game(this.player_two, this.message)
             }
         }
