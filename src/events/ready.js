@@ -19,6 +19,6 @@ client.on('ready', () => {
         const status = arrayOfStatus[index];
         client.user.setActivity(status),
             index++;
-    }, 900)
+    }, 5000)
 
 })
