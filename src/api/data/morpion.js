@@ -1,7 +1,5 @@
 const utils = require('./utils')
-const { MessageEmbed, SystemChannelFlags } = require('discord.js');
-const Schema = require('../../models/infos');
-const client = require('../../index');
+const { MessageEmbed } = require('discord.js');
 class Game {
     /**
      * @name tictactoe
@@ -127,6 +125,8 @@ class Game {
             if (this.grid[win_combinations[step_one][0]] == ':negative_squared_cross_mark:' && this.grid[win_combinations[step_one][1]] == ':negative_squared_cross_mark:' && this.grid[win_combinations[step_one][2]] == ':negative_squared_cross_mark:') {
                 let grid = await this.ttt_grid()
                 this.ttt_message.edit(new MessageEmbed().setColor("#2f3136").setTitle('Morpion - TicTacToe').setDescription(grid))
+
+
                 this.end_game(this.player_two, this.message)
 
 
